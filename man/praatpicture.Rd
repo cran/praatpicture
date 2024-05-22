@@ -18,6 +18,7 @@ praatpicture(
   wave_channelNames = FALSE,
   wave_color = "black",
   tg_obj = NULL,
+  tg_file = NULL,
   tg_tiers = "all",
   tg_focusTier = tg_tiers[1],
   tg_focusTierColor = "black",
@@ -26,7 +27,7 @@ praatpicture(
   tg_alignment = "central",
   tg_specialChar = FALSE,
   tg_color = "black",
-  spec_channel = 1,
+  spec_channel = NULL,
   spec_freqRange = c(0, 5000),
   spec_windowLength = 0.005,
   spec_dynamicRange = 50,
@@ -52,7 +53,6 @@ praatpicture(
   formant_freqRange = c(50, 5500),
   formant_plotType = "speckle",
   formant_color = "black",
-  formant_dottedLines = TRUE,
   formant_plotOnSpec = FALSE,
   formant_ssff = NULL,
   formant_axisLabel = "Frequency (Hz)",
@@ -64,6 +64,7 @@ praatpicture(
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   time_axisLabel = "Time (s)",
+  draw_lines = list("formant", h = seq(0, 10000, by = 1000), lty = "dotted"),
   draw_rectangle = NULL,
   draw_arrow = NULL,
   annotate = NULL,
@@ -91,8 +92,7 @@ details for more information.}
 
 \item{proportion}{Integer or vector of integers of the same size as \code{frames}
 giving the proportion in percents of the plotting area to be taken up by the
-individual frames. The numbers should sum up to 100.
-Default is \code{c(30,50,20)}. If more or less than three
+individual frames. Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
 
@@ -119,9 +119,14 @@ channels are named \code{Cn}, where \code{n} is the number of the channel. Alter
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
 
 \item{wave_color}{String giving the name of the color to be used for plotting
-the waveform. Default is \code{'black'}.}
+the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
+different colors should be used for different channels.}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
+
+\item{tg_file}{Path of file to be used for plotting TextGrid. Default is
+\code{NULL}, in which case the function searches for a TextGrid sharing the same
+base name as \code{sound} with the \code{.TextGrid} extension.}
 
 \item{tg_tiers}{Vector of numbers or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
@@ -204,7 +209,9 @@ this frequency. Default is \code{75}.}
 this frequency. Default is \code{600}.}
 
 \item{pitch_plotType}{String giving the type of pitch plot to produce; default
-is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).
+Alternatively a vector \code{c('draw','speckle')} can be passed, in which case
+both are used.}
 
 \item{pitch_scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
@@ -221,7 +228,9 @@ converting pitch frequency to semitones. Default is \code{100}.}
 
 \item{pitch_color}{String giving the name of the color to be used for
 plotting pitch. Default is \code{'black'}. If \code{pitch_plotOnSpec=TRUE}, axes will
-follow the same color scheme.}
+follow the same color scheme. Also if \code{pitch_plotOnSpec=TRUE}, a vector of
+two strings can be passed, in which case the second color is used for
+background highlighting.}
 
 \item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -255,15 +264,19 @@ be used for producing formant plots. Default is \code{c(0,5500)}.}
 
 \item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
-plot).}
+plot). Alternatively a vector \code{c('draw','speckle')} can be passed, in which
+case both are used.}
 
 \item{formant_color}{String or vector of strings giving the name(s) of
 colors to be used for plotting formants. If one color is provided, all
 formants will be plotted in this color. If multiple colors are provided,
-different formants will be shown in different colors. Default is \code{'black'}.}
-
-\item{formant_dottedLines}{Logical; should dotted lines indicate the
-locations of frequency multiples of 1000 as in Praat? Default is \code{TRUE}.}
+different formants will be shown in different colors. Default is \code{'black'}.
+If \code{formant_plotOnSpec=TRUE} and the length of this vector twice the number
+of formants plotted, the first
+half of strings will be used for the formants' primary colors and the second
+half will be used for background highlighting. If the length of this vector
+is one more than the number of formants plotted, the last string will
+be used for background highlighting.}
 
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -286,9 +299,10 @@ used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
 
 \item{intensity_color}{String giving the name of the color to be used for
-plotting intensity. Default is \code{'black'}.
-If \code{intensity_plotOnSpec=TRUE}, axes will
-follow the same color scheme.}
+plotting intensity. Default is \code{'black'}. If \code{intensity_plotOnSpec=TRUE},
+axes will follow the same color scheme. Also if \code{intensity_plotOnSpec=TRUE},
+a vector of two strings can be passed, in which case the second color is used
+for background highlighting.}
 
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -303,6 +317,20 @@ will be printed on the right-hand y-axis label.}
 
 \item{time_axisLabel}{String giving the name of the label to print along
 the x-axis. Default is \code{Time (s)}.}
+
+\item{draw_lines}{Use for drawing straight lines on plot components. Takes
+an argument of type \code{list} which should contain a) a string giving the plot
+component to draw straight lines on, and b) arguments to pass on to
+\link[graphics:abline]{graphics::abline}. Should have a named argument \code{h} for horizontal lines,
+or \code{v} for vertical lines, or \code{a},\code{b} for the intercept and slope of the
+line otherwise. Alternatively a nested list can be passed if more (sets of)
+lines should be drawn. If multiple audio
+channels are plotted and lines should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.
+The default value is \code{list('formant', h=seq(0,10000,by=1000), lty='dotted')}.
+According to Praat defaults, this means that if formants are plotted in a
+separate frame, horizontal dotted lines (\code{lty}) are shown at 1000 Hz
+intervals. To override this behavior, simply pass \code{draw_lines=NULL}.}
 
 \item{draw_rectangle}{Use for drawing rectangles on plot components. A
 vector containing a) a string giving the plot component to draw a rectangle

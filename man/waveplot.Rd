@@ -15,9 +15,11 @@ waveplot(
   focusTierColor = "black",
   focusTierLineType = "dotted",
   ind = NULL,
+  line_comp = NULL,
   rect_comp = NULL,
   arr_comp = NULL,
   annot_comp = NULL,
+  draw_lines = NULL,
   draw_rectangle = NULL,
   draw_arrow = NULL,
   annotate = NULL,
@@ -36,7 +38,8 @@ waveplot(
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
 
 \item{color}{String giving the name of the color to be used for plotting
-the waveform. Default is \code{'black'}.}
+the waveform. Default is \code{'black'}. Alternatively, a vector of colors, if
+different channels should be plotted with different colors.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}
@@ -57,6 +60,9 @@ the nth line type. Default is \code{'dotted'}.}
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}
 
+\item{line_comp}{Vector of strings or numbers giving plot components to draw
+straight lines on. Default is \code{NULL}.}
+
 \item{rect_comp}{Vector of strings or numbers giving plot components to draw
 rectangles on. Default is \code{NULL}.}
 
@@ -65,6 +71,9 @@ arrows on. Default is \code{NULL}.}
 
 \item{annot_comp}{Vector of strings of numbers giving plot components to
 annotate. Default is \code{NULL}.}
+
+\item{draw_lines}{List of arguments for drawing straight lines passed from
+\code{praatpicture()}. Default is \code{NULL}.}
 
 \item{draw_rectangle}{List of arguments for drawing rectangles passed from
 \code{praatpicture()}. Default is \code{NULL}.}
