@@ -40,7 +40,9 @@ specplot(
   focusTierLineType = "dotted",
   ind = NULL,
   min_max_only = TRUE,
-  axisLabel = "Frequency (Hz)"
+  axisLabel = "Frequency (Hz)",
+  drawSize = 1,
+  speckleSize = 1
 )
 }
 \arguments{
@@ -73,7 +75,13 @@ plotting parameters it is a good idea to choose a smaller value.}
 
 \item{windowShape}{String giving the name of the window shape to be applied
 to the signal when generating spectrograms. Default is \code{Gaussian}; other
-options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
+options are \code{square}, \code{Hamming}, \code{Bartlett}, \code{Hanning}, or \code{Blackman}.
+Note that the Gaussian window function provided by the \code{phonTools} package
+and used in \code{praatpicture()} does not have the same properties as the
+Gaussian window function used for spectral estimation in Praat; plotting
+a simple sine wave with high dynamic range will produce sidelobes in
+\code{praatpicture()} but not in Praat. It's recommended to use Blackman windows
+instead if you have this problem.}
 
 \item{colors}{Vector of strings giving the names of colors to be used
 for plotting the spectrogram; default is \code{c('white', 'black')}. The first
@@ -178,6 +186,15 @@ Ignored for TextGrid component.}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
+
+\item{drawSize}{Number indicating the line width of plot components where
+the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as
+line plots). Default is \code{1}. Controls the \code{lwd} argument of
+\link[graphics:lines]{graphics::lines}.}
+
+\item{speckleSize}{Number indicating the point size of plot components where
+the \verb{_plotType} is \code{'speckle'} (i.e. pitch or formants rendered as point
+plots). Default is \code{1}. Controls the \code{cex} arguments of \link[graphics:points]{graphics::points}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

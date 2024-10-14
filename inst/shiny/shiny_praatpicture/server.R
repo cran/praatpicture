@@ -1,3 +1,5 @@
+options(shiny.maxRequestSize=50*1024^2)
+
 server <- function(input, output, session) {
 
   curDev <- grDevices::dev.cur()
@@ -8,10 +10,12 @@ server <- function(input, output, session) {
       shinyjs::show('wave_color')
       shinyjs::show('wave_channels')
       shinyjs::show('wave_channelNames')
+      shinyjs::show('wave_lineWidth')
     } else {
       shinyjs::hide('wave_color')
       shinyjs::hide('wave_channels')
       shinyjs::hide('wave_channelNames')
+      shinyjs::hide('wave_lineWidth')
     }
 
     if ('TextGrid' %in% input$frames) {
@@ -100,6 +104,7 @@ server <- function(input, output, session) {
       shinyjs::show('formant_maxN')
       shinyjs::show('formant_color')
       shinyjs::show('formant_axisLabel')
+      shinyjs::show('formant_number')
     } else {
       shinyjs::hide('formant_plotType')
       shinyjs::hide('formant_freqRangeMin')
@@ -110,6 +115,7 @@ server <- function(input, output, session) {
       shinyjs::hide('formant_maxN')
       shinyjs::hide('formant_color')
       shinyjs::hide('formant_axisLabel')
+      shinyjs::hide('formant_number')
     }
 
     if ('intensity' %in% input$frames) {
@@ -166,6 +172,7 @@ server <- function(input, output, session) {
       shinyjs::show('formant_maxN')
       shinyjs::show('formant_color')
       shinyjs::show('formant_axisLabel')
+      shinyjs::show('formant_number')
     } else {
       shinyjs::hide('formant_plotType')
       shinyjs::hide('formant_freqRangeMin')
@@ -176,6 +183,7 @@ server <- function(input, output, session) {
       shinyjs::hide('formant_maxN')
       shinyjs::hide('formant_color')
       shinyjs::hide('formant_axisLabel')
+      shinyjs::hide('formant_number')
     }
   })
 
@@ -253,6 +261,11 @@ server <- function(input, output, session) {
     }
   })
 
+  observeEvent(input$tUnit, {
+    updateTextInput(inputId = 'time_axisLabel',
+                       value = 'Time (ms)')
+  })
+
   observeEvent(input$pitch_scale, {
     if (input$pitch_scale == 'semitones') {
       shinyjs::show('pitch_semitonesRe')
@@ -290,6 +303,12 @@ server <- function(input, output, session) {
   observeEvent(input$formant_windowLength, {
     updateNumericInput(inputId = 'formant_timeStep',
                        value = 0.25 * input$formant_windowLength)
+  })
+
+  observeEvent(input$formant_maxN, {
+    updateNumericInput(inputId = 'formant_number',
+                       value = input$formant_maxN,
+                       max = input$formant_maxN)
   })
 
   intensity_range <- reactive({
@@ -505,17 +524,22 @@ server <- function(input, output, session) {
                                start = as.numeric(input$start),
                                end = as.numeric(input$end),
                                tfrom0 = input$tfrom0,
+                               tUnit = input$tUnit,
                                frames = input$frames,
                                proportion = as.numeric(unlist(strsplit(
                                  input$proportion, ','
                                ))),
                                mainTitle = input$mainTitle,
+                               mainTitleAlignment = input$mainTitleAlignment,
                                start_end_only = input$start_end_only,
                                min_max_only = input$min_max_only,
                                time_axisLabel = input$time_axisLabel,
+                               speckleSize = input$speckleSize,
+                               drawSize = input$drawSize,
                                wave_color = input$wave_color,
                                wave_channels = wave_channels(),
                                wave_channelNames = channelNames(),
+                               wave_lineWidth = input$wave_lineWidth,
                                tg_file = input$tg_file$datapath,
                                tg_tiers = tg_tiers(),
                                tg_focusTier = tg_focusTier(),
@@ -569,6 +593,7 @@ server <- function(input, output, session) {
                                formant_maxN = input$formant_maxN,
                                formant_color = unlist(strsplit(
                                  input$formant_color, ',')),
+                               formant_number = input$formant_number,
                                formant_axisLabel = input$formant_axisLabel,
                                formant_plotOnSpec = input$formant_plotOnSpec,
                                intensity_range = intensity_range(),

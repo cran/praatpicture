@@ -23,7 +23,13 @@
 #' plotting parameters it is a good idea to choose a smaller value.
 #' @param windowShape String giving the name of the window shape to be applied
 #' to the signal when generating spectrograms. Default is `Gaussian`; other
-#' options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
+#' options are `square`, `Hamming`, `Bartlett`, `Hanning`, or `Blackman`.
+#' Note that the Gaussian window function provided by the `phonTools` package
+#' and used in `praatpicture()` does not have the same properties as the
+#' Gaussian window function used for spectral estimation in Praat; plotting
+#' a simple sine wave with high dynamic range will produce sidelobes in
+#' `praatpicture()` but not in Praat. It's recommended to use Blackman windows
+#' instead if you have this problem.
 #' @param colors Vector of strings giving the names of colors to be used
 #' for plotting the spectrogram; default is `c('white', 'black')`. The first
 #' value is used for plotting the lowest visible amplitude, and the last for
@@ -103,6 +109,13 @@
 #' Ignored for TextGrid component.
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
+#' @param drawSize Number indicating the line width of plot components where
+#' the `_plotType` is `'draw'` (i.e., pitch, formants, or intensity rendered as
+#' line plots). Default is `1`. Controls the `lwd` argument of
+#' [graphics::lines].
+#' @param speckleSize Number indicating the point size of plot components where
+#' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
+#' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -129,15 +142,16 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
                      focusTierLineType='dotted', ind=NULL,
                      min_max_only=TRUE,
-                     axisLabel='Frequency (Hz)') {
+                     axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
 
   wl <- windowLength*1000
   ts <- -timeStep
 
-  legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian')
+  legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian',
+                'Blackman')
   if (!windowShape %in% legal_ws) {
-    stop('Possible window shapes are square, Hamming, Bartlett, Hanning, or ',
-         'Gaussian.')
+    stop('Possible window shapes are square, Hamming, Bartlett, Hanning, ',
+         'Gaussian, or Blackman.')
   }
 
   if (tfrom0) {
@@ -150,6 +164,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   if (windowShape == 'Bartlett') ws <- 'bartlett'
   if (windowShape == 'Hanning') ws <- 'hann'
   if (windowShape == 'Gaussian') ws <- 'gaussian'
+  if (windowShape == 'Blackman') ws <- 'blackman'
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -227,31 +242,34 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     if ('draw' %in% formant_plotType) {
       if (length(formant_color) == nf*2) {
         graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[nf+1],
-                         lwd=3)
+                         lwd=drawSize+2)
       }
-      graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[1])
+      graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[1],
+                      lwd=drawSize)
       for (i in 2:nf) {
         if (length(formant_color) == nf*2) {
-          graphics::lines(fm$t, fm$frequencyArray[i,], lwd=3,
+          graphics::lines(fm$t, fm$frequencyArray[i,], lwd=drawSize+2,
                           col=formant_color[nf+i])
         }
-        graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i])
+        graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i],
+                        lwd=drawSize)
       }
     }
     if ('speckle' %in% formant_plotType) {
       if (length(formant_color) == nf*2) {
         graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                         lwd=3, col=formant_color[nf+1])
+                         cex=speckleSize, lwd=3,
+                         col=formant_color[nf+1])
       }
       graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                       col=formant_color[1])
+                       col=formant_color[1], cex=speckleSize)
       for (i in 2:nf) {
         if (length(formant_color) == nf*2) {
           graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                           lwd=3, col=formant_color[nf+i])
+                           lwd=3, col=formant_color[nf+i], cex=speckleSize)
         }
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=formant_color[i])
+                         col=formant_color[i], cex=speckleSize)
       }
     }
   }
@@ -269,14 +287,15 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     pt$f <- (pt$f - pfr[1]) * multiplier
 
     if ('draw' %in% pitch_plotType) {
-      if (length(pitch_color) == 2) graphics::lines(pt$t, pt$f, lwd=3,
+      if (length(pitch_color) == 2) graphics::lines(pt$t, pt$f, lwd=drawSize+2,
                                                     col=pitch_color[2])
-      graphics::lines(pt$t, pt$f, lwd=1, col=pitch_color[1])
+      graphics::lines(pt$t, pt$f, lwd=drawSize, col=pitch_color[1])
     }
     if ('speckle' %in% pitch_plotType) {
       if (length(pitch_color) == 2) graphics::points(pt$t, pt$f, lwd=3, pch=20,
-                                                     col=pitch_color[2])
-      graphics::points(pt$t, pt$f, pch=20, col=pitch_color[1])
+                                                     col=pitch_color[2],
+                                                     cex=speckleSize)
+      graphics::points(pt$t, pt$f, pch=20, col=pitch_color[1], cex=speckleSize)
     }
 
     pline <- c(3.5,1)
@@ -306,9 +325,10 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / iRan
     it$i <- (it$i - intensity_range[1]) * multiplier
 
-    if (length(intensity_color) == 2) graphics::lines(it$t, it$i, lwd=3,
+    if (length(intensity_color) == 2) graphics::lines(it$t, it$i,
+                                                      lwd=drawSize+2,
                                                       col=intensity_color[2])
-    graphics::lines(it$t, it$i, col=intensity_color[1])
+    graphics::lines(it$t, it$i, col=intensity_color[1], lwd=drawSize)
     iline <- c(3.5,1)
     if (pitch_plotOnSpec) iline <- c(3.5,3.5)
 
