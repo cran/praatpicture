@@ -1,0 +1,12 @@
+name: praatpicture
+title: praatpicture
+username: rpuggaardrode
+account: rpuggaardrode
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13011571
+bundleId: 9646410
+url: https://rpuggaardrode.shinyapps.io/praatpicture/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
