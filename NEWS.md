@@ -1,3 +1,13 @@
+# praatpicture 1.4.2
+* Added Shiny support for background highlighting.
+
+# praatpicture 1.4.1
+* Added support for a `background` argument in the `*_highlight` arguments.
+* Added `tg_edgeLabels` argument for controlling the behavior of TextGrid 
+intervals what fall partially outside of the plotting area.
+* Fixed a bug with the `*_highlight` arguments leading to crashes when there
+were TextGrid matches outside the plotting area.
+
 # praatpicture 1.4.0
 * Added a range of arguments to `praatpicture()` and sister functions for 
 differential highlighting of signals with colors, line width, point size to 
