@@ -20,6 +20,7 @@ praatpicture(
   speckleSize = 1,
   wave_channels = "all",
   wave_channelNames = FALSE,
+  wave_axisDigits = 3,
   wave_color = "black",
   wave_lineWidth = 1,
   wave_highlight = NULL,
@@ -53,6 +54,7 @@ praatpicture(
   pitch_semitonesRe = 100,
   pitch_color = "black",
   pitch_plotOnSpec = FALSE,
+  pitch_plotOnWave = FALSE,
   pitch_ssff = NULL,
   pitch_axisLabel = NULL,
   pitch_highlight = NULL,
@@ -73,6 +75,7 @@ praatpicture(
   intensity_range = NULL,
   intensity_color = "black",
   intensity_plotOnSpec = FALSE,
+  intensity_plotOnWave = FALSE,
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   intensity_highlight = NULL,
@@ -148,6 +151,12 @@ available. Alternatively, if two channels are available, they will be named
 \code{left} and \code{right}. If more or less than two channels are available,
 channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
+
+\item{wave_axisDigits}{Numeric giving the number of digits to print for
+values along the y-axis of the waveform. Default is \code{3}. If \code{0} is passed,
+the y-axis is suppressed. Note that this only applies when
+\code{min_max_only = TRUE}, as otherwise the look of the y-axis is determined
+entirely using \code{grDevices::axisTicks()}.}
 
 \item{wave_color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
@@ -305,6 +314,9 @@ background highlighting.}
 \item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
+\item{pitch_plotOnWave}{Boolean; should pitch be plotted on top of
+waveform? Default is \code{FALSE}.}
+
 \item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
 Default is \code{NULL}.}
 
@@ -399,6 +411,9 @@ for background highlighting.}
 
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
+
+\item{intensity_plotOnWave}{Boolean; should intensity be plotted on top of
+waveform? Default is \code{FALSE}.}
 
 \item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
 tracks. Default is \code{NULL}.}
