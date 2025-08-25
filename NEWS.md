@@ -1,6 +1,30 @@
+# praatpicture 1.6.2
+* `praatpicture()` has a new argument `wave_energyRange` for controlling the
+y-axis range of waveform(s). The default behavior of determining the range
+dynamically from the minima and maxima of each wave is not changed. 
+* Some leftover debugging code was removed from `pitch_overlay()`.
+
+# praatpicture 1.6.1
+* The `dynamicRange` argument of `draw_spectralslice()` was swapped for a more
+general `energyRange` argument. By default this is a single numeric `60` which 
+is interpreted as a dynamic range of 60 dB/Hz, but if a vector of two numbers is
+passed, it is interpreted as a concrete y-axis range.
+
+# praatpicture 1.6.0
+* Added a new stand-alone function `draw_spectralslice()` for plotting spectral 
+slices from a (window around a) time point of a sound file. The function is 
+flexible in terms of signal processing (spectral estimation method, window size 
+and shape) and presentation. Similar highlighting options are available as in 
+`praatpicture()` and sister functions. 
+
 # praatpicture 1.5.0
-* Added arguments `pitch_plotOnWave` and `intensity_plotOnWave` for overlaying pitch and intensity on waveforms, analogous to the `pitch_plotOnSpec` and `intensity_plotOnSpec` arguments. Since the code required for this is very similar for spectrograms and waveforms, I did some refactoring to avoid repeating code. (Thanks to Janne Lorenzen for the suggestion!)
-* Added Shiny support for waveform overlays and for controlling the y-axis digits in waveforms.
+* Added arguments `pitch_plotOnWave` and `intensity_plotOnWave` for overlaying 
+pitch and intensity on waveforms, analogous to the `pitch_plotOnSpec` and 
+`intensity_plotOnSpec` arguments. Since the code required for this is very 
+similar for spectrograms and waveforms, I did some refactoring to avoid 
+repeating code. (Thanks to Janne Lorenzen for the suggestion!)
+* Added Shiny support for waveform overlays and for controlling the y-axis 
+digits in waveforms.
 * Long overdue updates to some of the documentation.
 
 # praatpicture 1.4.4
